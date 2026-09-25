@@ -1,0 +1,33 @@
+// Suggestions become real profile-specific database rows only after explicit user action.
+export const categorySuggestions = [
+  { name: "Moradia", kind: "expense", icon: "home", color: "#5A6FE0" },
+  { name: "Alimentação", kind: "expense", icon: "utensils", color: "#E99546" },
+  { name: "Transporte", kind: "expense", icon: "car", color: "#339DB3" },
+  { name: "Saúde", kind: "expense", icon: "heart", color: "#D85C7A" },
+  { name: "Educação", kind: "expense", icon: "book", color: "#7666C3" },
+  { name: "Lazer", kind: "expense", icon: "tag", color: "#B06DBB" },
+  { name: "Assinaturas", kind: "expense", icon: "receipt", color: "#698BB0" },
+  { name: "Compras", kind: "expense", icon: "shopping", color: "#D87C54" },
+  { name: "Impostos", kind: "expense", icon: "receipt", color: "#7B8395" },
+  {
+    name: "Funcionários",
+    kind: "expense",
+    icon: "briefcase",
+    color: "#3E8C91",
+  },
+  { name: "Marketing", kind: "expense", icon: "briefcase", color: "#956CC5" },
+  {
+    name: "Fornecedores",
+    kind: "expense",
+    icon: "briefcase",
+    color: "#967646",
+  },
+  { name: "Outros", kind: "expense", icon: "tag", color: "#8A94A5" },
+  { name: "Salário", kind: "income", icon: "wallet", color: "#249477" },
+  { name: "Freelance", kind: "income", icon: "briefcase", color: "#388FA8" },
+  { name: "Venda", kind: "income", icon: "shopping", color: "#479466" },
+  { name: "Serviço", kind: "income", icon: "briefcase", color: "#487BC2" },
+  { name: "Comissão", kind: "income", icon: "wallet", color: "#248E9B" },
+  { name: "Rendimentos", kind: "income", icon: "wallet", color: "#649949" },
+  { name: "Outros", kind: "income", icon: "tag", color: "#72889B" },
+] as const;

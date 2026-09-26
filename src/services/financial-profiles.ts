@@ -11,8 +11,16 @@ export const getProfileContext = cache(async () => {
     ]);
   if (error || personalError) {
     // Log database diagnostics only; never session cookies, tokens or user data.
-    for (const [table, failure] of [["financial_profiles", error], ["profiles", personalError]] as const) {
-      if (failure) console.error("[profile-context]", { table, code: failure.code, message: failure.message });
+    for (const [table, failure] of [
+      ["financial_profiles", error],
+      ["profiles", personalError],
+    ] as const) {
+      if (failure)
+        console.error("[profile-context]", {
+          table,
+          code: failure.code,
+          message: failure.message,
+        });
     }
     throw new Error(
       "Não foi possível carregar seus perfis. Verifique a conexão e a migration do Supabase.",
@@ -20,5 +28,5 @@ export const getProfileContext = cache(async () => {
   }
   const selected = (await cookies()).get("financial_profile_id")?.value;
   const active = profiles.find((p) => p.id === selected) ?? profiles[0] ?? null;
-  return { profiles, active, userName: personal.full_name };
+  return { profiles, active, userName: personal.full_name, userId: user.id };
 });

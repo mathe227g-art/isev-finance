@@ -30,13 +30,26 @@ export async function login(_: FormState, form: FormData): Promise<FormState> {
       code: error.code,
       status: error.status,
     });
-    if (error.name === "AuthRetryableFetchError" || error.status === 0 || (error.status ?? 0) >= 500)
-      return { error: "Não foi possível conectar ao serviço de autenticação. Tente novamente em instantes." };
+    if (
+      error.name === "AuthRetryableFetchError" ||
+      error.status === 0 ||
+      (error.status ?? 0) >= 500
+    )
+      return {
+        error:
+          "Não foi possível conectar ao serviço de autenticação. Tente novamente em instantes.",
+      };
     if (error.status === 429)
-      return { error: "Muitas tentativas de acesso. Aguarde alguns minutos e tente novamente." };
+      return {
+        error:
+          "Muitas tentativas de acesso. Aguarde alguns minutos e tente novamente.",
+      };
+    if (error.code === "invalid_credentials")
+      return { error: "E-mail ou senha incorretos." };
+    if (error.code === "email_not_confirmed")
+      return { error: "Confirme seu e-mail antes de entrar." };
     return {
-      error:
-        "Não foi possível entrar. Verifique e-mail, senha e confirmação do e-mail.",
+      error: "Não foi possível entrar. Tente novamente.",
     };
   }
   redirect("/app");
@@ -94,8 +107,16 @@ export async function recover(
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
     redirectTo: appUrl() + "/auth/confirm?next=/nova-senha",
   });
-  if (error && (error.name === "AuthRetryableFetchError" || error.status === 0 || (error.status ?? 0) >= 500))
-    return { error: "O serviço está temporariamente indisponível. Tente novamente em instantes." };
+  if (
+    error &&
+    (error.name === "AuthRetryableFetchError" ||
+      error.status === 0 ||
+      (error.status ?? 0) >= 500)
+  )
+    return {
+      error:
+        "O serviço está temporariamente indisponível. Tente novamente em instantes.",
+    };
   if (error?.status === 429)
     return { error: "Aguarde alguns minutos antes de solicitar outro link." };
   return {
@@ -134,4 +155,35 @@ export async function logout(): Promise<void> {
     throw new Error("Não foi possível encerrar a sessão. Tente novamente.");
   (await cookies()).delete("financial_profile_id");
   redirect("/login?notice=logout");
+}
+
+export async function deleteOwnAccount(
+  _: FormState,
+  form: FormData,
+): Promise<FormState> {
+  if (form.get("confirmed") !== "yes")
+    return { error: "Confirme a exclusão permanente da conta." };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return {
+      error: "Sua sessão expirou. Entre novamente antes de excluir a conta.",
+    };
+  const { error } = await supabase.functions.invoke("delete-account", {
+    body: { confirmation: "DELETE_MY_ACCOUNT" },
+  });
+  if (error) {
+    console.error("[account-delete]", {
+      name: error.name,
+      message: error.message,
+    });
+    return {
+      error:
+        "Não foi possível excluir a conta. Tente novamente ou contate o suporte.",
+    };
+  }
+  (await cookies()).delete("financial_profile_id");
+  redirect("/login?notice=deleted");
 }

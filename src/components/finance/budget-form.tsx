@@ -4,6 +4,7 @@ import { saveBudget } from "@/app/actions/budgets";
 import { moneyInput, monthLabel } from "@/lib/finance";
 import type { Category } from "@/types/finance";
 import type { BudgetCategory } from "@/types/insights";
+import { MoneyInput } from "@/components/money-input";
 export function BudgetForm({
   profileId,
   month,
@@ -49,17 +50,14 @@ export function BudgetForm({
       )}
       <label>
         Limite mensal (R$)
-        <input
+        <MoneyInput
           name="amount"
-          inputMode="decimal"
-          required
-          placeholder="Ex.: 800,00"
           defaultValue={budget?.id ? moneyInput(budget.planned) : ""}
         />
       </label>
       <p className="field-hint">
-        O orçamento não movimenta dinheiro. O realizado acompanha despesas
-        pagas em conta e compras no cartão, pela data do lançamento.
+        O orçamento não movimenta dinheiro. O realizado acompanha despesas pagas
+        em conta e compras no cartão, pela data do lançamento.
       </p>
     </ActionForm>
   );

@@ -95,10 +95,16 @@ export function money(value: string) {
   return `${negative ? "- " : ""}R$ ${grouped},${fraction.padEnd(2, "0").slice(0, 2)}`;
 }
 export function moneyInput(value: string) {
-  return value.replace(".", ",");
+  const negative = value.startsWith("-");
+  const [whole, fraction = ""] = value.replace(/^-/, "").split(".");
+  const digits = `${whole}${fraction.padEnd(2, "0").slice(0, 2)}`;
+  return `${negative ? "-" : ""}${digits}`;
 }
 export function decimalInput(value: string) {
-  let clean = value.trim();
+  let clean = value
+    .replace(/R\$/gi, "")
+    .replace(/[\s\u00a0]/g, "")
+    .trim();
   if (clean.includes(",")) clean = clean.replace(/\./g, "").replace(",", ".");
   if (!/^-?\d{1,16}(\.\d{1,2})?$/.test(clean))
     throw new Error("Use um valor como 1.250,90, com até duas casas decimais.");

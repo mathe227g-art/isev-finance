@@ -23,6 +23,7 @@ test("stale forms and insufficient roles cannot write after a profile switch", (
 });
 test("decimal validation and formatting avoid floating point arithmetic", () => {
   assert.equal(decimalInput("1.250,90"), "1250.90");
+  assert.equal(decimalInput("R$ 1.250,50"), "1250.50");
   assert.equal(money("9999999999999999.99"), "R$ 9.999.999.999.999.999,99");
   assert.equal(money("-0.10"), "- R$ 0,10");
   assert.throws(() => decimalInput("1,234"));
@@ -39,7 +40,7 @@ test("Phase 2 financial integrity and tenant isolation", async (t) => {
     "202609220001_phase_one.sql",
     "202609220002_financial_core.sql",
     "202609220003_budgets_insights.sql",
-"202609220004_wealth_cards.sql",
+    "202609220004_wealth_cards.sql",
   ])
     await db.exec(
       await readFile(

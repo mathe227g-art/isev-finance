@@ -11,9 +11,11 @@ import {
   registerPurchase,
   payInvoice,
   movePosition,
+  deleteWealth,
 } from "@/app/actions/wealth";
 import { investmentTypes, itemTypes, movementTypes } from "@/lib/wealth";
 import { today, moneyInput, money } from "@/lib/finance";
+import { MoneyInput } from "@/components/money-input";
 import type { Account, Category } from "@/types/finance";
 import type {
   Card,
@@ -59,13 +61,7 @@ function Money({
   return (
     <label>
       {label}
-      <input
-        name={name}
-        inputMode="decimal"
-        defaultValue={value ? moneyInput(value) : ""}
-        placeholder="0,00"
-        required
-      />
+      <MoneyInput name={name} defaultValue={value ? moneyInput(value) : ""} />
     </label>
   );
 }
@@ -254,6 +250,37 @@ export function ArchiveCard({
         <label className="confirmation-check">
           <input type="checkbox" required name="confirmed" value="yes" />
           Confirmo esta alteração.
+        </label>
+      </ActionForm>
+    </FinanceDialog>
+  );
+}
+export function DeleteCard({
+  profileId,
+  card,
+}: {
+  profileId: string;
+  card: Card;
+}) {
+  return (
+    <FinanceDialog
+      label="Excluir cartão"
+      title="Excluir cartão permanentemente?"
+    >
+      <ActionForm
+        action={deleteWealth}
+        profileId={profileId}
+        id={card.id}
+        submit="Excluir cartão"
+      >
+        <Hidden values={{ entity: "card" }} />
+        <p>
+          Compras, parcelas e faturas deste cartão também serão excluídas. Esta
+          ação não pode ser desfeita.
+        </p>
+        <label className="confirmation-check">
+          <input name="confirmed" type="checkbox" required value="yes" />
+          Confirmo a exclusão permanente.
         </label>
       </ActionForm>
     </FinanceDialog>
@@ -525,6 +552,40 @@ export function PositionStatus({
         <label className="confirmation-check">
           <input name="confirmed" type="checkbox" required value="yes" />
           Confirmo esta alteração.
+        </label>
+      </ActionForm>
+    </FinanceDialog>
+  );
+}
+export function DeletePosition({
+  profileId,
+  position,
+}: {
+  profileId: string;
+  position: Position;
+}) {
+  const label =
+    position.kind === "reserve"
+      ? "Resetar reserva"
+      : position.kind === "goal"
+        ? "Excluir meta"
+        : "Excluir investimento";
+  return (
+    <FinanceDialog label={label} title={`${label}?`}>
+      <ActionForm
+        action={deleteWealth}
+        profileId={profileId}
+        id={position.id}
+        submit={label}
+      >
+        <Hidden values={{ entity: "position" }} />
+        <p>
+          Todo o histórico de movimentações deste registro será removido. Esta
+          ação não pode ser desfeita.
+        </p>
+        <label className="confirmation-check">
+          <input name="confirmed" type="checkbox" required value="yes" />
+          Confirmo a ação permanente.
         </label>
       </ActionForm>
     </FinanceDialog>

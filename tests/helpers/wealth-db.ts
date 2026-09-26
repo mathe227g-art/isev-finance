@@ -13,6 +13,7 @@ export async function wealthDb() {
     "20260924213950_customer_value_dashboard.sql",
     "20260924215207_security_performance_followup.sql",
     "20260924215635_business_clients_accountant_audit.sql",
+    "20260926010000_account_and_entity_deletion.sql",
   ])
     await db.exec(
       await readFile(
@@ -26,8 +27,11 @@ export async function wealthDb() {
     "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
     "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
   ];
-  for (const [index,id] of users.entries())
-    await db.query("insert into auth.users(id,email) values($1,$2)", [id,`user${index}@example.test`]);
+  for (const [index, id] of users.entries())
+    await db.query("insert into auth.users(id,email) values($1,$2)", [
+      id,
+      `user${index}@example.test`,
+    ]);
   const as = async (user: string) => {
     await db.exec("reset role");
     await db.query("select set_config('request.jwt.claim.sub',$1,false)", [

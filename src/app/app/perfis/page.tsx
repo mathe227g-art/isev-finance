@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Plus, Layers3 } from "lucide-react";
 import { getProfileContext } from "@/services/financial-profiles";
+import { ConfirmAction } from "@/components/finance/forms";
+import { deleteFinancialProfile } from "@/app/actions/financial-profiles";
 export default async function Profiles() {
-  const { profiles, active } = await getProfileContext();
+  const { profiles, active, userId } = await getProfileContext();
   return (
     <>
       <div className="page-heading">
@@ -45,6 +47,17 @@ export default async function Profiles() {
                     timeZone: "America/Sao_Paulo",
                   }).format(new Date(p.created_at))}
                 </small>
+                {p.owner_id === userId && (
+                  <div className="row-actions">
+                    <ConfirmAction
+                      profileId={p.id}
+                      id={p.id}
+                      action={deleteFinancialProfile}
+                      label="Excluir perfil"
+                      message={`Excluir permanentemente “${p.name}” e todos os dados financeiros vinculados? Esta ação não pode ser desfeita.`}
+                    />
+                  </div>
+                )}
               </article>
             ))}
           </div>

@@ -31,6 +31,7 @@ import { ProfileSelector } from "./profile-selector";
 import { logout } from "@/app/actions/auth";
 import type { FinancialProfile } from "@/types/database";
 import { PwaInstallButton } from "./pwa-install-button";
+import { MutationNotifications } from "./mutation-notifications";
 export function AppShell({
   profiles,
   active,
@@ -40,6 +41,7 @@ export function AppShell({
   profiles: FinancialProfile[];
   active: FinancialProfile | null;
   userName: string;
+  userId?: string;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -82,6 +84,7 @@ export function AppShell({
   }, [open]);
   return (
     <div className="app-shell">
+      <MutationNotifications />
       <a href="#main" className="skip-link">
         Pular para o conteúdo
       </a>
@@ -199,22 +202,55 @@ export function AppShell({
             </Link>
           ))}
           <span className="nav-label">FERRAMENTAS</span>
-          {active?.kind === "CNPJ" && [
-            { label: "Clientes e fornecedores", href: "/app/negocios", Icon: Building2 },
-            { label: "Equipe e contador", href: "/app/equipe", Icon: UserRoundCog },
-          ].map(({ label, href, Icon }) => (
-            <Link key={href} href={href} className={path === href ? "nav-item active" : "nav-item"} onClick={() => setOpen(false)}>
-              <Icon size={19} />{label}
-            </Link>
-          ))}
+          {active?.kind === "CNPJ" &&
+            [
+              {
+                label: "Clientes e fornecedores",
+                href: "/app/negocios",
+                Icon: Building2,
+              },
+              {
+                label: "Equipe e contador",
+                href: "/app/equipe",
+                Icon: UserRoundCog,
+              },
+            ].map(({ label, href, Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className={path === href ? "nav-item active" : "nav-item"}
+                onClick={() => setOpen(false)}
+              >
+                <Icon size={19} />
+                {label}
+              </Link>
+            ))}
           {[
-            { label: "Assinaturas", href: "/app/assinaturas", Icon: BadgeDollarSign },
+            {
+              label: "Assinaturas",
+              href: "/app/assinaturas",
+              Icon: BadgeDollarSign,
+            },
             { label: "Importar extrato", href: "/app/importar", Icon: Upload },
-            { label: "Relatório mensal", href: "/app/relatorio", Icon: FileText },
-            { label: "Personalizar painel", href: "/app/painel", Icon: Settings2 },
+            {
+              label: "Relatório mensal",
+              href: "/app/relatorio",
+              Icon: FileText,
+            },
+            {
+              label: "Personalizar painel",
+              href: "/app/painel",
+              Icon: Settings2,
+            },
           ].map(({ label, href, Icon }) => (
-            <Link key={href} href={href} className={path === href ? "nav-item active" : "nav-item"} onClick={() => setOpen(false)}>
-              <Icon size={19} />{label}
+            <Link
+              key={href}
+              href={href}
+              className={path === href ? "nav-item active" : "nav-item"}
+              onClick={() => setOpen(false)}
+            >
+              <Icon size={19} />
+              {label}
             </Link>
           ))}
         </nav>
@@ -229,10 +265,10 @@ export function AppShell({
           </div>
           <div className="user-row">
             <div className="avatar">{userName.slice(0, 1).toUpperCase()}</div>
-            <div>
+            <Link href="/app/conta" onClick={() => setOpen(false)}>
               <strong>{userName}</strong>
               <small>Minha conta</small>
-            </div>
+            </Link>
             <form action={logout}>
               <button
                 title="Sair da conta"

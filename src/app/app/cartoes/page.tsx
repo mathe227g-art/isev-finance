@@ -4,7 +4,12 @@ import { getFinanceOptions } from "@/services/finance";
 import { getWealth } from "@/services/wealth";
 import { PageHeading, EmptyState, ReadOnly } from "@/components/finance/shared";
 import { FinanceDialog } from "@/components/finance/forms";
-import { CardForm, ArchiveCard, PurchaseForm } from "@/components/wealth/forms";
+import {
+  CardForm,
+  ArchiveCard,
+  DeleteCard,
+  PurchaseForm,
+} from "@/components/wealth/forms";
 import {
   WealthNotice,
   WealthProgress,
@@ -112,7 +117,10 @@ export default async function CardsPage() {
                   </FinanceDialog>
                 )}
                 {ctx.role === "owner" && (
-                  <ArchiveCard profileId={ctx.profile.id} card={card} />
+                  <>
+                    <ArchiveCard profileId={ctx.profile.id} card={card} />
+                    <DeleteCard profileId={ctx.profile.id} card={card} />
+                  </>
                 )}
               </div>
             </article>

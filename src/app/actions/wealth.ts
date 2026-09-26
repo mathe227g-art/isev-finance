@@ -212,3 +212,25 @@ export async function saveSnapshot(
     return failure(e);
   }
 }
+
+export async function deleteWealth(
+  _: FormState,
+  form: FormData,
+): Promise<FormState> {
+  try {
+    const ctx = await context(form, true);
+    confirmed(form);
+    const entity = String(form.get("entity"));
+    if (!["card", "position"].includes(entity))
+      return { error: "Registro inválido." };
+    const { error } = await ctx.supabase.rpc("wealth_delete", {
+      p_profile: ctx.profile.id,
+      p_entity: entity,
+      p_id: uuidSchema.parse(form.get("id")),
+    });
+    if (error) throw error;
+    return done(entity === "card" ? "Cartão excluído." : "Registro excluído.");
+  } catch (e) {
+    return failure(e);
+  }
+}

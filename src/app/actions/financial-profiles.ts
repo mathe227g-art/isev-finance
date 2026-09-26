@@ -51,5 +51,33 @@ export async function switchProfile(
     return { error: "Perfil indisponível ou acesso não autorizado." };
   await selectCookie(data.id);
   revalidatePath("/app", "layout");
-  redirect("/app");
+  redirect("/app?profile=" + data.id);
+}
+
+export async function deleteFinancialProfile(
+  _: FormState,
+  form: FormData,
+): Promise<FormState> {
+  if (form.get("confirmed") !== "yes")
+    return { error: "Confirme a exclusão do perfil." };
+  const parsed = uuidSchema.safeParse(form.get("id"));
+  if (!parsed.success) return { error: "Perfil inválido." };
+  const { supabase, user } = await requireUser();
+  const { error } = await supabase
+    .from("financial_profiles")
+    .delete()
+    .eq("id", parsed.data)
+    .eq("owner_id", user.id);
+  if (error) {
+    console.error("[profile-delete]", {
+      code: error.code,
+      message: error.message,
+    });
+    return { error: "Não foi possível excluir o perfil e seus dados." };
+  }
+  const jar = await cookies();
+  if (jar.get("financial_profile_id")?.value === parsed.data)
+    jar.delete("financial_profile_id");
+  revalidatePath("/app", "layout");
+  redirect("/app/perfis?deleted=1");
 }

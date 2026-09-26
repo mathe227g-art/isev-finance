@@ -1,5 +1,12 @@
 "use client";
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useActionState,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Plus, X } from "lucide-react";
 import {
@@ -32,7 +39,10 @@ import type {
 } from "@/types/finance";
 import type { FormState } from "@/lib/validation";
 import { SubmitButton } from "@/components/submit-button";
+import { MoneyInput } from "@/components/money-input";
+import { notifyMutation } from "@/components/mutation-notifications";
 type Action = (state: FormState, form: FormData) => Promise<FormState>;
+const DialogCloseContext = createContext<(() => void) | null>(null);
 export function ActionForm({
   action,
   profileId,
@@ -50,9 +60,14 @@ export function ActionForm({
 }) {
   const [state, submitAction] = useActionState(action, {});
   const router = useRouter();
+  const closeDialog = useContext(DialogCloseContext);
   useEffect(() => {
-    if (state.success) router.refresh();
-  }, [state, router]);
+    if (state.success) {
+      notifyMutation("success", state.success);
+      closeDialog?.();
+      router.refresh();
+    } else if (state.error) notifyMutation("error", state.error);
+  }, [state, router, closeDialog]);
   return (
     <form action={submitAction} className={className}>
       <input type="hidden" name="financial_profile_id" value={profileId} />
@@ -117,7 +132,11 @@ export function FinanceDialog({
               <X size={21} />
             </button>
           </div>
-          {open && children}
+          {open && (
+            <DialogCloseContext.Provider value={() => ref.current?.close()}>
+              {children}
+            </DialogCloseContext.Provider>
+          )}
         </div>
       </dialog>
     </>
@@ -206,12 +225,10 @@ export function AccountForm({
       </div>
       <label>
         Saldo inicial (R$)
-        <input
+        <MoneyInput
           name="opening_balance"
-          inputMode="decimal"
-          required
-          defaultValue={account ? moneyInput(account.opening_balance) : "0,00"}
-          placeholder="2.500,00"
+          allowNegative
+          defaultValue={account ? moneyInput(account.opening_balance) : ""}
         />
       </label>
       <p className="field-hint">
@@ -400,12 +417,9 @@ export function TransactionForm({
       </label>
       <label>
         Valor (R$)
-        <input
+        <MoneyInput
           name="amount"
-          inputMode="decimal"
-          required
           defaultValue={transaction ? moneyInput(transaction.amount) : ""}
-          placeholder="0,00"
         />
       </label>
       <AccountSelect
@@ -585,12 +599,7 @@ export function RecurrenceForm({ profileId, accounts, categories }: Options) {
       </label>
       <label>
         Valor (R$)
-        <input
-          name="amount"
-          required
-          inputMode="decimal"
-          placeholder="1.000,00"
-        />
+        <MoneyInput name="amount" />
       </label>
       <AccountSelect accounts={accounts} />
       {accounts.some((a) => a.phase_three_ready) && type === "expense" && (

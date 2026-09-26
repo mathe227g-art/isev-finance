@@ -8,7 +8,12 @@ import {
   ReadOnly,
 } from "@/components/finance/shared";
 import { FinanceDialog } from "@/components/finance/forms";
-import { PositionForm, PositionStatus, MovementForm } from "./forms";
+import {
+  PositionForm,
+  PositionStatus,
+  MovementForm,
+  DeletePosition,
+} from "./forms";
 import { WealthNotice, WealthProgress } from "./shared";
 import { AllocationChart, WealthEvolution } from "./charts";
 import { money, formatDate } from "@/lib/finance";
@@ -240,6 +245,9 @@ export async function PositionsPage({ kind }: { kind: PositionKind }) {
                       status={p.status === "archived" ? "active" : "archived"}
                       label={p.status === "archived" ? "Reativar" : "Arquivar"}
                     />
+                  )}
+                  {ctx.role === "owner" && (
+                    <DeletePosition profileId={ctx.profile.id} position={p} />
                   )}
                   <Link className="text-link" href={`/app/posicoes/${p.id}`}>
                     Ver histórico →

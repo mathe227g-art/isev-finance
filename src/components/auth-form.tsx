@@ -2,7 +2,13 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { login, signup, recover, changePassword, signInWithGoogle } from "@/app/actions/auth";
+import {
+  login,
+  signup,
+  recover,
+  changePassword,
+  signInWithGoogle,
+} from "@/app/actions/auth";
 import { SubmitButton } from "./submit-button";
 export type AuthMode = "login" | "signup" | "recover" | "password";
 const actions = { login, signup, recover, password: changePassword };
@@ -15,9 +21,21 @@ const labels = {
 export function AuthForm({ mode }: { mode: AuthMode }) {
   const [state, action] = useActionState(actions[mode], {});
   const [visible, setVisible] = useState(false);
+  const [clientError, setClientError] = useState("");
   const hasPassword = mode !== "recover";
   return (
-    <form action={action} className="form-stack">
+    <form
+      action={action}
+      className="form-stack"
+      onSubmit={(event) => {
+        if (mode !== "signup" && mode !== "password") return;
+        const data = new FormData(event.currentTarget);
+        if (data.get("password") !== data.get("confirm")) {
+          event.preventDefault();
+          setClientError("As senhas não coincidem.");
+        } else setClientError("");
+      }}
+    >
       {(mode === "login" || mode === "signup") && (
         <>
           <button
@@ -27,14 +45,28 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             formNoValidate
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19">
-              <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.91h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.32 2.98-7.4Z"/>
-              <path fill="#34A853" d="M12 22c2.7 0 4.98-.9 6.63-2.37l-3.24-2.54c-.9.6-2.05.96-3.39.96-2.61 0-4.83-1.76-5.62-4.13H3.03v2.61A10 10 0 0 0 12 22Z"/>
-              <path fill="#FBBC05" d="M6.38 13.92A6.02 6.02 0 0 1 6.06 12c0-.67.12-1.32.32-1.92V7.47H3.03A10 10 0 0 0 2 12c0 1.61.39 3.14 1.03 4.53l3.35-2.61Z"/>
-              <path fill="#EA4335" d="M12 5.95c1.47 0 2.8.51 3.84 1.5l2.87-2.88A9.64 9.64 0 0 0 12 2a10 10 0 0 0-8.97 5.47l3.35 2.61C7.17 7.71 9.39 5.95 12 5.95Z"/>
+              <path
+                fill="#4285F4"
+                d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.91h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.32 2.98-7.4Z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 22c2.7 0 4.98-.9 6.63-2.37l-3.24-2.54c-.9.6-2.05.96-3.39.96-2.61 0-4.83-1.76-5.62-4.13H3.03v2.61A10 10 0 0 0 12 22Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M6.38 13.92A6.02 6.02 0 0 1 6.06 12c0-.67.12-1.32.32-1.92V7.47H3.03A10 10 0 0 0 2 12c0 1.61.39 3.14 1.03 4.53l3.35-2.61Z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.95c1.47 0 2.8.51 3.84 1.5l2.87-2.88A9.64 9.64 0 0 0 12 2a10 10 0 0 0-8.97 5.47l3.35 2.61C7.17 7.71 9.39 5.95 12 5.95Z"
+              />
             </svg>
             Continuar com Google
           </button>
-          <div className="auth-divider"><span>ou continue com e-mail</span></div>
+          <div className="auth-divider">
+            <span>ou continue com e-mail</span>
+          </div>
         </>
       )}
       {mode === "signup" && (
@@ -95,7 +127,8 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       {(mode === "signup" || mode === "password") && (
         <>
           <p id="password-hint" className="field-hint">
-            Use 8 ou mais caracteres, com maiúscula, minúscula, número e símbolo.
+            Use 8 ou mais caracteres, com maiúscula, minúscula, número e
+            símbolo.
           </p>
           <label>
             Confirme a senha
@@ -116,9 +149,9 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           Esqueci minha senha
         </Link>
       )}
-      {state.error && (
+      {(clientError || state.error) && (
         <p className="feedback error" role="alert">
-          {state.error}
+          {clientError || state.error}
         </p>
       )}
       {state.success && (

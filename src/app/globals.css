@@ -237,6 +237,20 @@ label {
   background: #ecf9f2;
   border: 1px solid #d5efdf;
 }
+.mutation-toast {
+  position: fixed;
+  z-index: 1000;
+  right: 24px;
+  bottom: 24px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 14px 18px;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(8, 37, 69, 0.2);
+  font-size: 14px;
+  font-weight: 650;
+}
+.danger-zone { border-color: #ffd8dc; }
+.danger-zone .button.primary { background: #b4232f; }
 .neutral {
   color: #225c91;
   background: #eef6ff;

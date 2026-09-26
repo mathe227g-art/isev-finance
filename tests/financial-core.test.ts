@@ -26,6 +26,7 @@ test("decimal validation and formatting avoid floating point arithmetic", () => 
   assert.equal(decimalInput("R$ 1.250,50"), "1250.50");
   assert.equal(money("9999999999999999.99"), "R$ 9.999.999.999.999.999,99");
   assert.equal(money("-0.10"), "- R$ 0,10");
+  assert.equal(money(1250.5), "R$ 1.250,50");
   assert.throws(() => decimalInput("1,234"));
   assert.throws(() => decimalInput("Infinity"));
   assert.equal(transactionSchema.safeParse({ amount: "0" }).success, false);

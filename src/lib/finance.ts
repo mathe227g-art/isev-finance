@@ -88,15 +88,17 @@ export function monthLabel(month: string) {
   }).format(new Date(month + "-01T12:00:00Z"));
 }
 // Only rendering uses BigInt cents; all balances/aggregates are calculated in SQL NUMERIC.
-export function money(value: string) {
-  const negative = value.startsWith("-");
-  const [whole, fraction = ""] = value.replace(/^-/, "").split(".");
+export function money(value: string | number) {
+  const normalized = String(value);
+  const negative = normalized.startsWith("-");
+  const [whole, fraction = ""] = normalized.replace(/^-/, "").split(".");
   const grouped = BigInt(whole || "0").toLocaleString("pt-BR");
   return `${negative ? "- " : ""}R$ ${grouped},${fraction.padEnd(2, "0").slice(0, 2)}`;
 }
-export function moneyInput(value: string) {
-  const negative = value.startsWith("-");
-  const [whole, fraction = ""] = value.replace(/^-/, "").split(".");
+export function moneyInput(value: string | number) {
+  const normalized = String(value);
+  const negative = normalized.startsWith("-");
+  const [whole, fraction = ""] = normalized.replace(/^-/, "").split(".");
   const digits = `${whole}${fraction.padEnd(2, "0").slice(0, 2)}`;
   return `${negative ? "-" : ""}${digits}`;
 }
